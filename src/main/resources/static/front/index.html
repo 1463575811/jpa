@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="/webjars/jquery/3.4.0/jquery.min.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div id="app">
+    <div class="col-md-10 mx-auto">
+        <table class="table table-dark table-hover">
+            <thead>
+            <th>
+            <td>
+                <input @click="appChecked()" name="allCheck" type="checkbox">
+            </td>
+            <td>2</td>
+            <td>2</td>
+            <td>2</td>
+            <td>2</td>
+            </th>
+            </thead>
+            <tbody>
+            <tr v-for="(n, index) in 10">
+                <td>
+                    <input name="subCheck" type="checkbox">
+                </td>
+                <td>1 {{index}}</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            </tbody>
+        </table>
+        <button @click="appChecked()" class="btn btn-info">click</button>
+    </div>
+</div>
+
+<script src="/webjars/vue/2.6.10/dist/vue.min.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            test: 'test'
+        },
+        methods: {
+            appChecked() {
+                var check = $("input[name='allCheck']")
+                if(check.prop('checked')){
+                    $("input[type='checkbox']").prop('checked', true);
+                }else{
+                    $("input[type='checkbox']").prop('checked', false);
+                }
+            },
+            delete(){
+                $("input[type='checkbox']:checked").remove()
+            }
+        }
+    })
+</script>
+</body>
+</html>
