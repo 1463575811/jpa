@@ -26,4 +26,7 @@ public class User {
 
     @Column
     private String sex;
+
+    @Column
+    private String headPic;
 }
