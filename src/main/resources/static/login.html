@@ -5,35 +5,52 @@
     <title>登陆</title>
     <link type="text/css" rel="stylesheet" href="/webjars/bootstrap/4.3.1/css/bootstrap.min.css">
     <style>
-        #loginBlock{
-            height: 400px;
+        #loginBlock {
+            background-color: rgba(71, 255, 135, 0.44);
+            height: 300px;
             width: 500px;
             position: relative;
             top: 500px;
             opacity: 0;
         }
+
+        .enterInput {
+            padding-top: 40px;
+            padding-bottom: 20px;
+        }
+
+        .inputItem {
+            height: 50px;
+        }
     </style>
 </head>
-<body style='background: url("/images/quanzhong/quanzhong1.jpg") no-repeat;
-    background-size: 1450px 1000px;
-'>
-    <div class="container">
+<body>
+<div class="container">
 
-        <button class="btn btn-info" onclick="move()">click</button>
-        <div id="loginBlock" class="mx-auto border-dark">
-            12
-        </div>
-
+    <div id="loginBlock" class="mx-auto">
+        <form role="form">
+            <div class="enterInput">
+                <input id="username" name="username" type="text" class="form-control col-md-8 mx-auto inputItem" placeholder="enter your username"/>
+            </div>
+            <div class="enterInput">
+                <input id="password" name="password" type="password" class="form-control col-md-8 mx-auto inputItem" placeholder="enter your password"/>
+            </div>
+            <div class="col-md-6 offset-5">
+                <input type="button" value="login" class="btn btn-primary align-items-center">
+            </div>
+        </form>
     </div>
 
-    <script src="/webjars/jquery/3.4.0/jquery.min.js"></script>
-    <script>
-        $(function () {
-            $("#loginBlock").animate({
-                top: '-=350px',
-                opacity: '1.0'
-            }, 'slow')
-        })
-    </script>
+</div>
+
+<script src="/webjars/jquery/3.4.0/jquery.min.js"></script>
+<script>
+    $(function () {
+        $("#loginBlock").animate({
+            top: '-=350px',
+            opacity: '1.0'
+        }, 'slow')
+    })
+</script>
 </body>
 </html>
