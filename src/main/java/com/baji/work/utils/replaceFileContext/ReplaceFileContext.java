@@ -20,23 +20,17 @@ public class ReplaceFileContext {
 
     public static void main(String[] args) {
 
-        var replaceBean = ReplaceBean.builder()
-                .targetFile(new File("E:/autoUpdateFileContext/mdlMain.vb"))
-                .toFile(new File("E:/autoUpdateFileContext/mdlMain2.vb"))
-                .targetContext(new String[]{
-                        "Dim strSql As String = String.Empty",
-                        "call DbConn()",
-                        "Call CloseDBLink()"
-                })
-                .toContext(new StringBuilder())
-                .startContext("'EDIT >>> DEL SR.劉軍豪 " + new SimpleDateFormat("yyyy/mm/dd").format(new Date()) + " 番号：000\n")
-                .endContext("'<<< EDIT DEL " + new SimpleDateFormat("yyyy/mm/dd").format(new Date()) + "\n")
-                .build();
-
-        new ReplaceFileContext().doReplaceContext(replaceBean);
+        new ReplaceFileContext().doReplaceContext(ReplaceBean.init());
 
     }
 
+
+    /**
+     * 生成注释内容
+     * @param replaceBean
+     * @param nowLine
+     * @return
+     */
     private String doGetContext(ReplaceBean replaceBean, String nowLine) {
         int count = nowLine.lastIndexOf("\t");
         String temp = "";
@@ -51,6 +45,10 @@ public class ReplaceFileContext {
                 .toString();
     }
 
+    /**
+     * 读取文件, 判断是否需要注释, 如果是添加注释, 写出新文件
+     * @param replaceBean
+     */
     private void doReplaceContext(ReplaceBean replaceBean) {
 
         try (InputStream is = new FileInputStream(replaceBean.getTargetFile());
@@ -80,6 +78,12 @@ public class ReplaceFileContext {
 
     }
 
+    /**
+     * 判断是否为需要添加注释的内容
+     * @param targetContexts
+     * @param nowLine
+     * @return
+     */
     private boolean isTargetContext(String[] targetContexts, String nowLine) {
         if (null != targetContexts) {
             for (String targetContext : targetContexts) {
