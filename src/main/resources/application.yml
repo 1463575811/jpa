@@ -15,4 +15,7 @@ spring:
       settings:
         web-allow-others: true
       enabled: true
+  mvc:
+    view:
+      suffix: .html
 
