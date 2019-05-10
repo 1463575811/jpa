@@ -1,9 +1,7 @@
 package com.baji.work.utils.replaceFileContext;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletOutputStream;
 import java.io.*;
 
 /**
@@ -14,54 +12,13 @@ import java.io.*;
  * <p>
  * vb单行注释代码生成器
  */
+@Slf4j
 public class ReplaceFileContext {
-
-    /**
-     * 事务相关统计  partern依据
-     */
-    private static int beginTrans;
-    private static int commitTrans;
 
     public static void main(String[] args) {
 
-        System.out.println(new ReplaceFileContext().doReplaceContext(ReplaceBean.init()));
+        log.info(new ReplaceFileContext().doReplaceContext(ReplaceBean.init()));
 
-    }
-
-
-    /**
-     * 生成注释内容
-     *
-     * @param replaceBean
-     * @param nowLine
-     * @return
-     */
-    private String doGetContext(ReplaceBean replaceBean, String nowLine) {
-        int count = nowLine.lastIndexOf(' ');
-        String temp = "";
-        if (count != 0 || count != -1) {
-            System.out.println(count);
-            for (int i = 0; i <= count; i++) {
-                temp += " ";
-            }
-            replaceBean.getToContext().setLength(0);
-            return replaceBean.getToContext()
-                    .append(temp + replaceBean.getStartContext())
-                    .append(temp + "'" + nowLine.trim() + "\n")
-                    .append(temp + replaceBean.getEndContext())
-                    .toString();
-        } else {
-            count = nowLine.lastIndexOf("\t");
-            for (int i = 0; i <= count; i++) {
-                temp += "\t";
-            }
-        }
-        replaceBean.getToContext().setLength(0);
-        return replaceBean.getToContext()
-                .append(temp + replaceBean.getStartContext())
-                .append(temp + "'" + nowLine.trim() + "\n")
-                .append(temp + replaceBean.getEndContext())
-                .toString();
     }
 
     /**
@@ -70,7 +27,19 @@ public class ReplaceFileContext {
      * @param replaceBean
      */
     private String doReplaceContext(ReplaceBean replaceBean) {
+
+        //用于记录每个动作的发现的事务相关代码
+        StringBuilder transReport = new StringBuilder();
+
+        //将生成前和生成后的代码放在不同的文件夹, 新地方可能没有创建, 在此处进行创建
+        if (!replaceBean.getToFilePath().exists()) {
+            replaceBean.getToFilePath().mkdir();
+        }
+
+        //遍历目标文件夹下的所有文件, 进行判断和加注释
         for (File file : replaceBean.getTargetFilePath().listFiles()) {
+
+            //获取输入输出流
             try (InputStream is = new FileInputStream(file);
                  InputStreamReader isReader = new InputStreamReader(is);
                  BufferedReader reader = new BufferedReader(isReader);
@@ -78,16 +47,30 @@ public class ReplaceFileContext {
                  OutputStreamWriter osWriter = new OutputStreamWriter(os);
                  BufferedWriter writer = new BufferedWriter(osWriter)) {
 
+                //循环读取该文件每一行代码
                 while (true) {
+
+                    //now  当前行内容
                     String now = reader.readLine();
-                    replaceBean.getToContext().setLength(0);
                     if (now != null) {
 
-                        if (isTargetContext(replaceBean.getTargetContext(), now)) {
-                            writer.write(doGetContext(replaceBean, now));
+                        //判断是哪个类型的内容. 如果都不是, 原样输出
+                        if (replaceBean.getDelTypeBean().isThisType(now)) {
+                            DEL_TYPE_Bean delete = replaceBean.getDelTypeBean();
+                            writer.write(delete.doReplaceContext(now));
+
+                            transReport.append("DEL操作发现的开启事务次数:-- " + delete.beginTrans + ", 提交事务次数:-- " + delete.commitTrans + "\n");
+                        } else if (replaceBean.getAddTypeBean().isThisType(now)) {
+                            writer.write(replaceBean.getAddTypeBean().doReplaceContext(now));
+                        } else if (replaceBean.getUpdTypeBean().isThisType(now)) {
+                            log.info("upd也进来了!!");
+                            writer.write(replaceBean.getUpdTypeBean().doReplaceContext(now));
                         } else {
+
                             writer.write("" + now + "\n");
                         }
+
+
                     } else {
                         break;
                     }
@@ -96,33 +79,10 @@ public class ReplaceFileContext {
                 e.printStackTrace();
             }
         }
-        return "开启事务次数:-- " + beginTrans + "/n 提交事务次数:-- " +commitTrans;
-    }
 
-    /**
-     * 判断是否为需要添加注释的内容
-     *
-     * @param targetContexts
-     * @param nowLine
-     * @return
-     */
-    private boolean isTargetContext(String[] targetContexts, String nowLine) {
-        if (null != targetContexts) {
-            for (String targetContext : targetContexts) {
-                if (targetContext.equals(nowLine.trim())) {
-                    if ("g_oraDb.BeginTrans()".equals(nowLine.trim())) {
-                        beginTrans++;
-                    } else if ("g_oraDb.CommitTrans()".equals(nowLine.trim())
-                    ||"g_oraSs.CommitTrans()".equals(nowLine.trim())) {
-                        commitTrans++;
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
+        //返回事务信息
+        return transReport.toString();
     }
-
 
 }
 

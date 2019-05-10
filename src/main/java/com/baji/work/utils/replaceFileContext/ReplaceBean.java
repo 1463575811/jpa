@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @author baji
@@ -27,10 +25,6 @@ public class ReplaceBean {
      */
     private File toFilePath;
 
-    /**
-     * 要被注释的内容
-     */
-    private String[] targetContext;
 
     /**
      * 注释生成的内容
@@ -38,65 +32,23 @@ public class ReplaceBean {
     private StringBuilder toContext;
 
     /**
-     * 注释开头
+     * 删除相关的注释的判断/执行
      */
-    private String startContext;
+    private DEL_TYPE_Bean delTypeBean;
 
     /**
-     * 注释结尾
+     * 添加相关的注释的判断/执行
      */
-    private String endContext;
+    private ADD_TYPE_Bean addTypeBean;
 
-    private class DEL_TYPE extends contextType{
+    /**
+     * 变更相关的注释的判断/执行
+     */
+    private UPD_TYPE_Bean updTypeBean;
 
-        public DEL_TYPE(String[] targetContext){
-            super.targetContext = targetContext;
-        }
+    //待升级
+    //private List<String> allContext;
 
-        @Override
-        public boolean isThisType(String nowLine) {
-            return false;
-        }
-
-        @Override
-        public String doReplaceContext(String nowLine, ReplaceBean bean) {
-            return null;
-        }
-    }
-
-    private class ADD_TYPE extends contextType{
-
-        public ADD_TYPE(String[] targetContext){
-            super.targetContext = targetContext;
-        }
-
-        @Override
-        public boolean isThisType(String nowLine) {
-            return false;
-        }
-
-        @Override
-        public String doReplaceContext(String nowLine, ReplaceBean bean) {
-            return null;
-        }
-    }
-
-    private class UPD_TYPE extends contextType{
-
-        public UPD_TYPE(String[] targetContext){
-            super.targetContext = targetContext;
-        }
-
-        @Override
-        public boolean isThisType(String nowLine) {
-            return false;
-        }
-
-        @Override
-        public String doReplaceContext(String nowLine, ReplaceBean bean) {
-            return null;
-        }
-    }
 
     /**
      * 初始化数据
@@ -104,32 +56,14 @@ public class ReplaceBean {
      */
     public static ReplaceBean init() {
         return ReplaceBean.builder()
-                .targetFilePath(new File("E:/autoUpdateFileContext/skShenMeShenMeList"))
-                .toFilePath(new File("E:/autoUpdateFileContext/skShenMeShenMeList2"))
-                .targetContext(new String[]{
-                        "Dim strSql As String = String.Empty",
-                        "Dim strSql2 As String = String.Empty",
-                        "Dim strSql As String = String.Empty 'SQL生成用",
-                        "Dim strSQL As String = String.Empty",
-                        "Call DbConn()",
-                        "Call CloseDBLink()",
-                        "g_oraSs.Rollback()",
-                        "Call NIT_OraRemoveParam(g_oraDb)",
-                        "Call NIT_OraRemoveParam(g_oraDb) ' バインド変数の設定",
-                        "g_oraSs.BeginTrans()",
-                        "Call DbDisConn()",
-                        "Call NIT_OraRemoveParam(g_oraDb) 'ﾊﾞｲﾝﾄﾞ変数 ｸﾘｱ",
-                        "Call NIT_OraRemoveParam(g_oraSs)",
-                        "Call DbLinkDisConn() 'DBLink切断",
-                        "g_oraDb.BeginTrans()",
-                        "g_oraDb.CommitTrans()",
-                        "Call DbLinkDisConn()",
-                        "g_oraSs.CommitTrans()"
-                })
+                .targetFilePath(new File("E:/autoUpdateFileContext/cds_S_SHIP_DIFF_DATA"))
+                .toFilePath(new File("E:/autoUpdateFileContext/cds_S_SHIP_DIFF_DATA2"))
                 .toContext(new StringBuilder())
-                .startContext("'EDIT >>> DEL SR.劉軍豪 " + new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + " 番号：000\n")
-                .endContext("'<<< EDIT DEL " + new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "\n")
+                .delTypeBean(DEL_TYPE_Bean.DEL_TYPE_INIT())
+                .addTypeBean(ADD_TYPE_Bean.ADD_TYPE_INIT())
+                .updTypeBean(UPD_TYPE_Bean.UPD_TYPE_INIT())
                 .build();
+
     }
 
 
